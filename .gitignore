@@ -1,0 +1,7 @@
+# ignore everything
+*
+
+# Only include
+!compute_bench.py
+!Homework5.Rmd
+!.gitignore
