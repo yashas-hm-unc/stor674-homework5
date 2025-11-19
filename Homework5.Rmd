@@ -118,21 +118,30 @@ version to keep.
 
 ---
 
-# Part 2: Docker Image Creation and Deployment with Version Control (50 points)
-
-In this section, you will create a Docker image that can run the `compute_bench.py` script (which you used in Homework 2), which benchmarks CPU/GPU performance using PyTorch. **You will version control the entire process using Git and GitHub, practicing branching and merging workflows.**
-
-**Important Note on Operating Systems:** You may be working on macOS or Windows, but Docker containers run Linux by default. You will be building a **Linux-based container** that will run on Longleaf (which is also Linux). Docker handles the cross-platform compatibility automatically, so your Linux container built on macOS/Windows will work seamlessly on Longleaf's Linux environment.
-
 ## Question 2.0: GitHub Repository Setup (5 points)
 
 Before building your Docker image, you will set up version control for your project.
 
-**a)** (1 points) Create a new GitHub repository called `stor674-homework5` (or similar name). Initialize it with a README. Provide the GitHub repository URL.
+**a)** (1 points) Create a new GitHub repository called `stor674-homework5` (or similar name). Initialize it with a
+README. Provide the GitHub repository URL.
 
-**GitHub Repository URL:**
+**GitHub Repository URL:**<br>
+[Repo Link](https://github.com/yashas-hm-unc/stor674-homework5)
 
-<!-- Your GitHub repo URL here -->
+**b)** (2 points) Clone the repository to your local machine, add the provided files (`compute_bench.py`, this
+`Homework5.Rmd`), and make your initial commit. What commands did you use?
+
+**Answer:**
+
+```bash
+# Commands you used
+git init
+git branch -M main
+git add .
+git commit -m "Initial Commit"
+git remote add origin https://github.com/yashas-hm-unc/stor674-homework5.git
+git push -u origin main
+```
 
 
 **b)** (2 points) Clone the repository to your local machine, add the provided files (`compute_bench.py`, this `Homework5.Rmd`), and make your initial commit. What commands did you use?
