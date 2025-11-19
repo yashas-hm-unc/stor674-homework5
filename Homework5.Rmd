@@ -148,20 +148,20 @@ Before building your Docker image, you will set up version control for your proj
 
 ```
 
-**c)** (2 points) Create a new branch called `docker-build` where you will develop your Dockerfile. What command did you use? Why is it good practice to use a separate branch for development instead of working directly on `main`?
+**c)** (2 points) Create a new branch called `docker-build` where you will develop your Dockerfile. What command did you
+use? Why is it good practice to use a separate branch for development instead of working directly on `main`?
 
 **Answer:**
 
 ```bash
 # Command to create and switch to branch
-
-
+git checkout -b docker-build
 ```
 
 **Explanation:**
 
-<!-- Why use a separate branch? -->
-
+Using a separate branch for development is good practice because it keeps the main branch stable and deployable, allows
+you to work on new features or fixes without affecting others.
 
 ## Question 2.1: Understanding compute_bench.py (5 points)
 
@@ -169,19 +169,20 @@ Before building your Docker image, you will set up version control for your proj
 
 **Answer:**
 
-<!-- Write your answer here -->
-
+The script benchmarks tensor computations in PyTorch on CPU and GPU, measuring time to process large arrays, generates a
+small sample of random numbers, and saves it to a file.
 
 **b)** (2 points) What Python packages does `compute_bench.py` require?
 
 **Answer:**
 
-<!-- Write your answer here -->
-
+- torch (PyTorch)
+- time (Standard Lib)
 
 ## Question 2.2: Create a Dockerfile (10 points)
 
 Create a Dockerfile that:
+
 - Uses an appropriate **Linux-based** base image with Python 3.9 or later
 - Installs the required Python packages (PyTorch with CUDA support for GPU computing)
 - Copies `compute_bench.py` into the container
@@ -189,14 +190,18 @@ Create a Dockerfile that:
 
 **Important Considerations:**
 
-- **Operating System**: Even if you're on macOS or Windows, Docker will build a Linux container. Use Linux base images (e.g., `python:3.9-slim` is based on Debian Linux).
+- **Operating System**: Even if you're on macOS or Windows, Docker will build a Linux container. Use Linux base images (
+e.g., `python:3.9-slim` is based on Debian Linux).
 
 - **CUDA Support**: Longleaf has NVIDIA GPUs. To enable GPU support in your container:
   - Option 1: Use official PyTorch image with CUDA: `pytorch/pytorch:2.0.0-cuda11.7-cudnn8-runtime`
-  - Option 2: Install PyTorch with CUDA support: `pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118`
-  - Note: The container itself doesn't need NVIDIA drivers (Longleaf provides those), but PyTorch needs to be CUDA-aware.
+  - Option 2: Install PyTorch with CUDA support:
+`pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118`
+  - Note: The container itself doesn't need NVIDIA drivers (Longleaf provides those), but PyTorch needs to be
+CUDA-aware.
 
-- **Testing Locally**: If your computer doesn't have an NVIDIA GPU, the container will still build and run (it will just use CPU). On Longleaf with GPU nodes, it will automatically detect and use the GPU.
+- **Testing Locally**: If your computer doesn't have an NVIDIA GPU, the container will still build and run (it will just
+use CPU). On Longleaf with GPU nodes, it will automatically detect and use the GPU.
 
 **Instructions:**
 
@@ -205,15 +210,24 @@ Create a Dockerfile that:
 3. Write the Dockerfile content below:
 
 ```dockerfile
-# Paste your Dockerfile content here
+# (Debian Based)
+FROM python:3.9-slim
 
+# Set working directory
+WORKDIR /scripts
 
+# Install torch dependency
+RUN pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
 
+# Copy the compute_bench.py script into the container
+COPY compute_bench.py .
 
-
+# Default command to run the script
+CMD ["python", "compute_bench.py"]
 ```
 
 **Grading Criteria:**
+
 - Appropriate Linux base image selection (2 points)
 - CUDA-enabled PyTorch installation (4 points)
 - Proper file copying (2 points)
@@ -226,52 +240,58 @@ Create a Dockerfile that:
 **Answer:**
 
 ```bash
-# Your command here
-
+docker build -t hw5 .
 ```
 
 **Explanation:**
 
-<!-- Explain each part of your command -->
-
+- docker build —> Tells Docker to build a new image.
+- -t hw5 —> Tags the image for later use.
+- . —> The build context (Current Working Directory)
 
 **b)** (4 points) What command did you use to run your Docker image locally to test it? Include the output you received.
 
 **Answer:**
 
 ```bash
-# Your command here
-
+docker run --rm hw5
 ```
 
 **Output:**
 
 ```
-# Paste the output here
+No GPU available, running on CPU only
 
+CPU Computations:
+Time for 10,000,000 elements: 0.0979 seconds
+Time for 100,000,000 elements: 0.9571 seconds
 
+Small sample of 10 random numbers:
+tensor([-0.1326, -1.5500,  1.1859,  1.5597,  0.7008, -0.4011, -1.1648,  0.1153,
+        -0.3273, -0.3363])
+
+Saved data to mydata.pt
 ```
 
 **c)** (3 points) Were there any issues you encountered during the build or test? How did you resolve them?
 
 **Answer:**
 
-<!-- Write your answer here -->
-
+No issues, but the `pytorch/pytorch:2.0.0-cuda11.7-cudnn8-runtime` image was greater than 3GB so used the
+`python:3.9-slim` image to speed up the build process.
 
 ## Question 2.4: Version Control Your Docker Build (10 points)
 
 Now that you have a working Dockerfile, let's commit it and merge it into the main branch.
 
-**a)** (3 points) On your `docker-build` branch, add and commit your Dockerfile with a descriptive commit message. What commands did you use?
+**a)** (3 points) On your `docker-build` branch, add and commit your Dockerfile with a descriptive commit message. What
+commands did you use?
 
 **Answer:**
 
 ```bash
-# Commands to add and commit Dockerfile
-
-
-
+git add Dockerfile
+git commit -m "update: .gitignore, add: Dockerfile"
 ```
 
 **b)** (4 points) Switch to the `main` branch and merge the `docker-build` branch into it. What commands did you use? Paste the merge message or output.
