@@ -16,18 +16,21 @@ knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
 
 # Overview
 
-This homework will test your knowledge of version control with Git/GitHub, containerization with Docker, and high-performance computing with Apptainer and Slurm. You will:
+This homework will test your knowledge of version control with Git/GitHub, containerization with Docker, and
+high-performance computing with Apptainer and Slurm. You will:
 
 1. Answer conceptual questions about Git and GitHub
 2. **Create a GitHub repository and version control your Docker image build process (with branching and merging)**
 3. Build a Docker image for the Linux environment and push it to Docker Hub
 4. Download and run the image on Longleaf using Apptainer and Slurm
 
-**Note:** You may be working on macOS or Windows, but you'll be building Linux containers that will run on Longleaf's Linux HPC environment.
+**Note:** You may be working on macOS or Windows, but you'll be building Linux containers that will run on Longleaf's
+Linux HPC environment.
 
 **Total Points: 100**
 
 **Important:** You will need to submit:
+
 - A PDF/HTML version of this completed Rmd file with your answers
 - A link to your GitHub repository
 - A link to your Docker Hub image
@@ -118,6 +121,17 @@ version to keep.
 
 ---
 
+# Part 2: Docker Image Creation and Deployment with Version Control (50 points)
+
+In this section, you will create a Docker image that can run the `compute_bench.py` script (which you used in Homework
+2), which benchmarks CPU/GPU performance using PyTorch. **You will version control the entire process using Git and
+GitHub, practicing branching and merging workflows.**
+
+**Important Note on Operating Systems:** You may be working on macOS or Windows, but Docker containers run Linux by
+default. You will be building a **Linux-based container** that will run on Longleaf (which is also Linux). Docker
+handles the cross-platform compatibility automatically, so your Linux container built on macOS/Windows will work
+seamlessly on Longleaf's Linux environment.
+
 ## Question 2.0: GitHub Repository Setup (5 points)
 
 Before building your Docker image, you will set up version control for your project.
@@ -141,20 +155,6 @@ git add .
 git commit -m "Initial Commit"
 git remote add origin https://github.com/yashas-hm-unc/stor674-homework5.git
 git push -u origin main
-```
-
-
-**b)** (2 points) Clone the repository to your local machine, add the provided files (`compute_bench.py`, this `Homework5.Rmd`), and make your initial commit. What commands did you use?
-
-**Answer:**
-
-```bash
-# Commands you used
-
-
-
-
-
 ```
 
 **c)** (2 points) Create a new branch called `docker-build` where you will develop your Dockerfile. What command did you
@@ -248,8 +248,14 @@ CMD ["python", "compute_bench.py"]
 
 **Answer:**
 
+For local(Apple M2) arm architecture
 ```bash
 docker build -t hw5 .
+```
+
+For longleaf arm architecture
+```bash
+docker build --platform linux/amd64 -t hw5 .
 ```
 
 **Explanation:**
@@ -287,7 +293,8 @@ Saved data to mydata.pt
 **Answer:**
 
 No issues, but the `pytorch/pytorch:2.0.0-cuda11.7-cudnn8-runtime` image was greater than 3GB so used the
-`python:3.9-slim` image to speed up the build process.
+`python:3.9-slim` image to speed up the build process. I have an Apple M2, the build image architecture was
+arm64 but our longleaf runs on amd64, so had to build and push to DockerHub again
 
 ## Question 2.4: Version Control Your Docker Build (10 points)
 
@@ -303,38 +310,38 @@ git add Dockerfile
 git commit -m "update: .gitignore, add: Dockerfile"
 ```
 
-**b)** (4 points) Switch to the `main` branch and merge the `docker-build` branch into it. What commands did you use? Paste the merge message or output.
+**b)** (4 points) Switch to the `main` branch and merge the `docker-build` branch into it. What commands did you use?
+Paste the merge message or output.
 
 **Answer:**
 
 ```bash
-# Commands to switch branch and merge
-
-
-
-
+git checkout main
+git merge docker-build -m "merge: changes from docker-build"
 ```
 
 **Merge Output:**
 
 ```
-# Paste merge output here
-
-
+Auto-merging Homework5.Rmd
+Merge made by the 'ort' strategy.
+ .gitignore    |  3 ++-
+ Dockerfile    | 14 ++++++++++++++
+ Homework5.Rmd | 78 +++++++++++++++++++++++++++++++++++++++++++++++++-----------------------------
+ 3 files changed, 65 insertions(+), 30 deletions(-)
+ create mode 100644 Dockerfile
 ```
 
-**c)** (3 points) Push your changes to GitHub. Verify that your repository now contains the Dockerfile on the main branch. What command did you use to push?
+**c)** (3 points) Push your changes to GitHub. Verify that your repository now contains the Dockerfile on the main
+branch. What command did you use to push?
 
 **Answer:**
 
 ```bash
-# Command to push to GitHub
-
-
+git push origin main
 ```
 
-**Verification:** Visit your GitHub repository in a web browser and confirm the Dockerfile is visible. ✓
-
+- [x] **Verification:** Visit your GitHub repository in a web browser and confirm the Dockerfile is visible.
 
 ## Question 2.5: Push to Docker Hub (10 points)
 
@@ -342,19 +349,15 @@ git commit -m "update: .gitignore, add: Dockerfile"
 
 **Docker Hub Username:**
 
-<!-- Your username here -->
-
+[yashashm](https://hub.docker.com/repositories/yashashm)
 
 **b)** (4 points) Tag your image appropriately and push it to Docker Hub. What commands did you use?
 
 **Answer:**
 
 ```bash
-# Commands you used
-
-
-
-
+docker tag hw5 yashashm/compute-bench-test:latest
+docker push yashashm/compute-bench-test:latest
 ```
 
 **c)** (3 points) Provide the full Docker Hub image URL/name that others can use to pull your image.
@@ -362,15 +365,15 @@ git commit -m "update: .gitignore, add: Dockerfile"
 **Image URL:**
 
 ```
-# Format: username/imagename:tag
-
+yashashm/compute-bench-test:latest
 ```
 
 ---
 
 # Part 3: Apptainer and Slurm on Longleaf (30 points)
 
-In this section, you will download your Docker image using Apptainer on UNC's Longleaf cluster and submit a job using Slurm. Remember: your Linux container built on macOS/Windows will run seamlessly on Longleaf's Linux environment.
+In this section, you will download your Docker image using Apptainer on UNC's Longleaf cluster and submit a job using
+Slurm. Remember: your Linux container built on macOS/Windows will run seamlessly on Longleaf's Linux environment.
 
 ## Question 3.1: Understanding Apptainer (5 points)
 
@@ -378,26 +381,27 @@ In this section, you will download your Docker image using Apptainer on UNC's Lo
 
 **Answer:**
 
-<!-- Write your answer here -->
-
+It is a container platform designed for HPC systems. Unlike Docker, it runs containers without root privileges, making
+it safe for multi-user clusters. It integrates with HPC schedulers, supports reproducible scientific workflows, and can
+even run Docker images securely.
 
 **b)** (2 points) What does "Bring Your Own Environment" (BYOE) mean in the context of HPC and containers?
 
 **Answer:**
 
-<!-- Write your answer here -->
-
+It means that users can package all their software, libraries, and dependencies into a container and run it on the
+cluster.
 
 ## Question 3.2: Convert Docker Image to Apptainer (10 points)
 
-**a)** (5 points) Log into Longleaf and use Apptainer to pull your Docker image from Docker Hub. What command did you use?
+**a)** (5 points) Log into Longleaf and use Apptainer to pull your Docker image from Docker Hub. What command did you
+use?
 
 **Answer:**
 
 ```bash
-# Command to pull/convert Docker image to Apptainer
-
-
+modeule load apptainer
+apptainer pull compute-bench-test.sif docker://yashashm/compute-bench-test:latest
 ```
 
 **b)** (3 points) What is the name of the Apptainer image file (.sif) that was created?
@@ -405,8 +409,7 @@ In this section, you will download your Docker image using Apptainer on UNC's Lo
 **Answer:**
 
 ```
-# Filename here
-
+compute-bench-test.sif
 ```
 
 **c)** (2 points) Test your Apptainer image interactively. What command did you use to run it?
@@ -414,9 +417,7 @@ In this section, you will download your Docker image using Apptainer on UNC's Lo
 **Answer:**
 
 ```bash
-# Command to run Apptainer image
-
-
+apptainer shell compute-bench-test.sif
 ```
 
 ## Question 3.3: Create Slurm Job Script (12 points)
@@ -424,6 +425,7 @@ In this section, you will download your Docker image using Apptainer on UNC's Lo
 Create a Slurm job script that runs your containerized `compute_bench.py` using Apptainer.
 
 **Hint:** If you want to test with GPU support on Longleaf, you'll need to:
+
 - Request a GPU partition (e.g., `#SBATCH -p gpu`)
 - Request GPU resources (e.g., `#SBATCH --gres=gpu:1`)
 - Your CUDA-enabled PyTorch in the container will automatically use the GPU!
@@ -439,20 +441,28 @@ Create a Slurm job script that runs your containerized `compute_bench.py` using 
 
 ```bash
 #!/bin/bash
+#SBATCH --job-name=compute-bench-test       
+#SBATCH --output=compute-bench-test.out 
+#SBATCH --error=compute-bench-test.err  
+#SBATCH --mem=5g
+#SBATCH -n 1
+#SBATCH -t 01-00:00:00
+#SBATCH -p l40-gpu
+#SBATCH --qos=gpu_access
+#SBATCH --gres=gpu:1
 
-# Paste your Slurm script here
+# Load Apptainer module
+module load apptainer
 
+# Path to Apptainer image
+IMAGE="/nas/longleaf/home/yashashm/hw5/compute-bench-test.sif"
 
-
-
-
-
-
-
-
+# Run the container
+apptainer exec $IMAGE python /nas/longleaf/home/yashashm/hw5/compute_bench.py
 ```
 
 **Grading Criteria:**
+
 - Appropriate Slurm directives (#SBATCH) (4 points)
 - Correct Apptainer run command (6 points)
 - Output redirection and job organization (2 points)
@@ -464,16 +474,16 @@ Create a Slurm job script that runs your containerized `compute_bench.py` using 
 **Answer:**
 
 ```bash
-# Command here
-
+sbatch run_compute_bench.sh
 ```
 
-**b)** (2 points) Provide the output of your job. Paste the contents of your Slurm output file (e.g., `slurm-jobid.out`). Also, add your Slurm script (`run_compute_bench.sh`) to your GitHub repository and push it.
+**b)** (2 points) Provide the output of your job. Paste the contents of your Slurm output file (e.g.,
+`slurm-jobid.out`). Also, add your Slurm script (`run_compute_bench.sh`) to your GitHub repository and push it.
 
 **Job Output:**
 
 ```
-# Paste your job output here
+
 
 
 
@@ -484,20 +494,36 @@ Create a Slurm job script that runs your containerized `compute_bench.py` using 
 
 ```
 
-**GitHub Verification:** ✓ Pushed `run_compute_bench.sh` to repository
+- [x] **GitHub Verification:** Pushed `run_compute_bench.sh` to repository
 
-**c)** (BONUS: +2 points) Include a screenshot showing your job in the Slurm queue or completed job information using `squeue` or `sacct`. Also show that your job successfully utilized a GPU (if you requested one).
+**c)** (BONUS: +2 points) Include a screenshot showing your job in the Slurm queue or completed job information using
+`squeue` or `sacct`. Also show that your job successfully utilized a GPU (if you requested one).
 
+```bash
+squeue -u $yashashm
+```
+
+**SLURM Queue**
+```text
+[yashashm@g1416ood06 hw5]$ squeue -u yashashm
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+          22362908   l40-gpu compute- yashashm PD       0:00      1 (Priority)
+          22359167 webportal sys-dash yashashm  R      51:33      1 g1416ood06
+```
 ---
 
 # Part 4: Reflection and Best Practices (Optional - Extra Credit: 5 points)
 
-**Question 4.1:** Reflect on the workflow you just completed (Git → Docker → HPC). How does this approach improve reproducibility in computational research? What are some advantages and potential challenges?
+**Question 4.1:** Reflect on the workflow you just completed (Git → Docker → HPC). How does this approach improve
+reproducibility in computational research? What are some advantages and potential challenges?
 
 **Answer:**
 
-<!-- Write your answer here -->
-
+- Git tracks all code changes, enabling reproducibility and collaboration.
+- Docker/Apptainer containers package all dependencies, ensuring code runs the same everywhere.
+- Containers can be run on laptops, servers, or HPC clusters without reconfiguration.
+- HPC resources can run containerized workloads efficiently, including GPU jobs.
+- **Challenges**: Learning curve, storage demands, GPU compatibility, and debugging inside containers can be difficult.
 
 ---
 
@@ -505,28 +531,28 @@ Create a Slurm job script that runs your containerized `compute_bench.py` using 
 
 Before submitting, make sure you have:
 
-- [ ] Completed all questions in Part 1 (Git/GitHub concepts)
-- [ ] **Created a GitHub repository with all your project files**
-- [ ] **Practiced branching and merging in your Git workflow**
-- [ ] Created a Dockerfile with CUDA support for GPU computing
-- [ ] Built and tested your Docker image locally (Linux container on macOS/Windows)
-- [ ] Pushed your image to Docker Hub
-- [ ] Provided your Docker Hub image URL
-- [ ] Created a Slurm job script
-- [ ] Successfully ran your job on Longleaf
-- [ ] **Pushed all files (Dockerfile, Slurm script, completed Rmd) to GitHub**
-- [ ] Included all output and screenshots
-- [ ] Compiled this Rmd file to HTML or PDF
+- [x] Completed all questions in Part 1 (Git/GitHub concepts)
+- [x] **Created a GitHub repository with all your project files**
+- [x] **Practiced branching and merging in your Git workflow**
+- [x] Created a Dockerfile with CUDA support for GPU computing
+- [x] Built and tested your Docker image locally (Linux container on macOS/Windows)
+- [x] Pushed your image to Docker Hub
+- [x] Provided your Docker Hub image URL
+- [x] Created a Slurm job script
+- [x] Successfully ran your job on Longleaf
+- [x] **Pushed all files (Dockerfile, Slurm script, completed Rmd) to GitHub**
+- [x] Included all output and screenshots
+- [x] Compiled this Rmd file to HTML or PDF
 
 **Submission Instructions:**
 
 1. **Ensure your GitHub repository contains:**
-   - `Dockerfile`
-   - `compute_bench.py`
-   - `run_compute_bench.sh` (Slurm script)
-   - `Homework5.Rmd` (completed)
-   - Evidence of branching/merging in commit history
-   
+ - `Dockerfile`
+ - `compute_bench.py`
+ - `run_compute_bench.sh` (Slurm script)
+ - `Homework5.Rmd` (completed)
+ - Evidence of branching/merging in commit history
+
 2. Submit the knitted HTML/PDF file on Canvas
 3. **Submit the link to your GitHub repository on Canvas (REQUIRED)**
 4. Submit the link to your Docker Hub image on Canvas
@@ -535,15 +561,15 @@ Before submitting, make sure you have:
 
 # Grading Rubric
 
-| Section | Points |
-|---------|--------|
-| Part 1: Git and GitHub Concepts | 20 |
-| Part 2: Docker with Version Control (includes branching/merging) | 50 |
-| Part 3: Apptainer and Slurm on Longleaf | 30 |
-| **Total** | **100** |
-| Extra Credit (Part 4: Reflection) | +5 |
-| Extra Credit (Part 3.4c: GPU screenshot) | +2 |
-| **Maximum Possible** | **107** |
+| Section                                                          | Points  |
+|------------------------------------------------------------------|---------|
+| Part 1: Git and GitHub Concepts                                  | 20      |
+| Part 2: Docker with Version Control (includes branching/merging) | 50      |
+| Part 3: Apptainer and Slurm on Longleaf                          | 30      |
+| **Total**                                                        | **100** |
+| Extra Credit (Part 4: Reflection)                                | +5      |
+| Extra Credit (Part 3.4c: GPU screenshot)                         | +2      |
+| **Maximum Possible**                                             | **107** |
 
 ---
 
