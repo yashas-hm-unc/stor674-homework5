@@ -248,12 +248,12 @@ CMD ["python", "compute_bench.py"]
 
 **Answer:**
 
-For local(Apple M2) arm architecture
+For local(Apple M2) ARM architecture
 ```bash
 docker build -t hw5 .
 ```
 
-For longleaf arm architecture
+For longleaf AMD architecture
 ```bash
 docker build --platform linux/amd64 -t hw5 .
 ```
@@ -498,7 +498,8 @@ Small sample of 10 random numbers:
 tensor([ 0.3367,  0.1288,  0.2345,  0.2303, -1.1229, -0.1863,  2.2082, -0.6380,
          0.4617,  0.2674])
 
-Saved data to mydata.pt```
+Saved data to mydata.pt
+```
 
 - [x] **GitHub Verification:** Pushed `run_compute_bench.sh` to repository
 
